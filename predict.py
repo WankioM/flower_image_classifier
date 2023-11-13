@@ -15,8 +15,8 @@ from os import listdir
 import json
 import argparse
 
-# Initiate variables with default values
-checkpoint = 'checkpoint.pth'
+
+checkpoint = 'checkpoint.pth' #checkpoint filename
 filepath = 'cat_to_name.json'    
 arch=''
 image_path = 'flowers/test/100/image_07896.jpg'
@@ -70,7 +70,7 @@ def load_model(checkpoint_path):
     else:
         print('Sorry base architecture not recognised')
     
-    model.class_to_idx = checkpoint['class_to_idx']
+    model.class_to_idx = checkpoint['class_to_idx'] # code as from workspace??
     hidden_units = checkpoint['hidden_units']
     
     classifier = nn.Sequential(OrderedDict([
@@ -94,10 +94,8 @@ def process_image(image_path):
     ''' Scales, crops, and normalizes a PIL image for a PyTorch model,
         returns an Numpy array
     '''
-    
-    # Process a PIL image for use in a PyTorch model
     size = 256, 256
-    crop_size = 128
+    crop_size = 128 #size after transforming
     
     im = Image.open(image_path)
     
@@ -125,22 +123,20 @@ def predict(image_path, model, topk=5):
     ''' Predict the class (or classes) of an image using a trained deep learning model.
     '''
     
-    # Use process_image function to create numpy image tensor
     pytorch_np_image = process_image(image_path)
     
-    # Changing from numpy to pytorch tensor
+    # Numpy to pytorch tensor
     pytorch_tensor = torch.tensor(pytorch_np_image)
     pytorch_tensor = pytorch_tensor.float()
-    
-    # Removing RunTimeError for missing batch size - add batch size of 1 
+   
     pytorch_tensor = pytorch_tensor.unsqueeze(0)
     
-    # Run model in evaluation mode to make predictions
+    # Run in eval
     model.eval()
     LogSoftmax_predictions = model.forward(pytorch_tensor)
     predictions = torch.exp(LogSoftmax_predictions)
     
-    # Identify top predictions and top labels
+    # Top 5 labels with most prediction
     top_preds, top_labs = predictions.topk(topk)
     
     
@@ -155,13 +151,10 @@ def predict(image_path, model, topk=5):
     
     return labels
 
-model = load_model(checkpoint) 
+model = load_model(checkpoint) #consider changing to checkpoint.pth
 
 print('-' * 40)
-
 print(model)
-print('The model being used for the prediction is above.')
-input("When you are ready - press Enter to continue to the prediction.")
 labels = predict(image_path,model,topk)
 print('-' * 40)
 print(labels)
