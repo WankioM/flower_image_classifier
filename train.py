@@ -121,7 +121,7 @@ def network_trainer(Model, Trainloader, Testloader, Device,
     
     if type(Epochs) == type(None):
         Epochs = 10
-        print("12 epochs.")    
+          
  
     print("Training started .....\n")
 
@@ -137,7 +137,7 @@ def network_trainer(Model, Trainloader, Testloader, Device,
             
             Optimizer.zero_grad()
             
-            # Forward and backward passes
+            #Forward pass, backward pass
             outputs = model.forward(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
@@ -168,7 +168,7 @@ def network_trainer(Model, Trainloader, Testloader, Device,
 
 
 
-#Function validate_model(Model, Testloader, Device) validate the above model on test data images
+#Validation using the test batch
 def validate_model(Model, Testloader, Device):
    # Do validation on the test set
     correct,total = 0,0
@@ -185,7 +185,7 @@ def validate_model(Model, Testloader, Device):
     print('Test Accuracy: %d%%' % (100 * correct / total))
     
 
-# Function initial_checkpoint(Model, Save_Dir, Train_data) saves the model at a defined checkpoint
+
 def initial_checkpoint(Model, Save_Dir, Train_data):
        
     # Save model at checkpoint
@@ -204,7 +204,6 @@ def initial_checkpoint(Model, Save_Dir, Train_data):
                          'checkpoint.pth')
             Model.class_to_idx = Train_data.class_to_idx
 
-                # Create checkpoint dictionary
             checkpoint = {'architecture': Model.name,
                           'classifier': Model.classifier,
                           'class_to_idx': Model.class_to_idx,
@@ -216,21 +215,20 @@ def initial_checkpoint(Model, Save_Dir, Train_data):
                 print("Directory not found, model will not be saved.")
 
 def main():
-     
-    # Get Keyword Args for Training
-    args = arg_parser()
     
-    # Set directory for training
+    args = arg_parser()
+  
     data_dir = 'flowers'
     train_dir = data_dir + '/train'
     valid_dir = data_dir + '/valid'
     test_dir = data_dir + '/test'
     
-    # Pass transforms in, then create trainloader
+    # Transform
     train_data = test_transformer(train_dir)
     valid_data = train_transformer(valid_dir)
     test_data = train_transformer(test_dir)
     
+    #Data loaders
     trainloader = data_loader(train_data)
     validloader = data_loader(valid_data, train=False)
     testloader = data_loader(test_data, train=False)
@@ -251,7 +249,7 @@ def main():
     criterion = nn.NLLLoss()
     optimizer = optim.Adam(model.classifier.parameters(), lr=learning_rate)
     
-    print_every = 30
+    print_every = 20
     steps = 0
     
     trained_model = network_trainer(model, trainloader, validloader,device, criterion, optimizer, args.epochs, print_every, steps)
@@ -261,4 +259,5 @@ def main():
     validate_model(trained_model, testloader, device)
    
     initial_checkpoint(trained_model, args.save_dir, train_data)
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    main()
